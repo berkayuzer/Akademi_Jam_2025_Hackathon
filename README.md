@@ -1,1 +1,0 @@
-# Akademi_Jam_2025_Hackathon
