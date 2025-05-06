@@ -10,6 +10,7 @@ from google.genai import types
 load_dotenv()
 print(f"[DEBUG] os.environ.get('GEMINI_KEY') = {os.environ.get('GEMINI_KEY')}")
 
+
 def gr_register(username, password):
     try:
         r = requests.post("http://localhost:8000/register", json={"username": username, "password": password})
@@ -199,6 +200,59 @@ def render_simple_roadmap_from_file(filepath="roadmap.json"):
         html += '</details>'
     html += "</div>"
     return html
+def build_challenge_ui():
+        with gr.Blocks() as challenge_ui:
+            gr.Markdown("## Kod Challenge'ları")
+
+            # Challenge seçimi
+            challenge_dropdown = gr.Dropdown(
+                label="Challenge Seçin",
+                choices=[c["title"] for c in load_challenges()],
+                type="index"
+            )
+
+            challenge_description = gr.Markdown()
+            difficulty_label = gr.Label(label="Zorluk Seviyesi")
+            starter_code = gr.Code(label="Başlangıç Kodu", language="python")
+
+            user_code = gr.Code(label="Çözümünüz", language="python")
+            run_btn = gr.Button("Kodu Çalıştır")
+
+            test_results = gr.Textbox(label="Test Sonuçları", interactive=False)
+
+            def load_challenge_details(index):
+                challenges = load_challenges()
+                if 0 <= index < len(challenges):
+                    challenge = challenges[index]
+                    return (
+                        f"### {challenge['title']}\n\n{challenge['description']}",
+                        challenge["difficulty"],
+                        challenge["starter_code"],
+                        challenge["starter_code"]
+                    )
+                return "", "", "", ""
+
+            challenge_dropdown.change(
+                load_challenge_details,
+                inputs=[challenge_dropdown],
+                outputs=[challenge_description, difficulty_label, starter_code, user_code]
+            )
+
+            def execute_code(code, challenge_index):
+                challenges = load_challenges()
+                if 0 <= challenge_index < len(challenges):
+                    challenge = challenges[challenge_index]
+                    success, results = execute_python_code(code, challenge["test_cases"])
+                    return results
+                return "Challenge bulunamadı"
+
+            run_btn.click(
+                execute_code,
+                inputs=[user_code, challenge_dropdown],
+                outputs=test_results
+            )
+
+        return challenge_ui
 
 def build_ui():
     with gr.Blocks() as demo:
@@ -229,6 +283,11 @@ def build_ui():
             field_oop = gr.Checkbox(label="Nesne Yönelimli Programlama")
             save_btn = gr.Button("Kaydet")
             deficiency_result = gr.Textbox(label="", interactive=False)
+
+        challenge_box = gr.Group(visible=False)
+        with challenge_box:
+            challenge_ui = build_challenge_ui()
+            back_btn_challenge = gr.Button("Geri Dön")
 
         # Roadmap UI
         roadmap_box = gr.Group(visible=False)
@@ -267,6 +326,11 @@ def build_ui():
                     "",
                     msg
                 )
+
+        challenge_box = gr.Group(visible=False)
+        with challenge_box:
+            challenge_ui = build_challenge_ui()
+            back_btn_challenge = gr.Button("Geri Dön")
 
         login_btn.click(
             handle_login,
@@ -315,5 +379,24 @@ def build_ui():
             lambda: (gr.update(visible=True), gr.update(visible=False)),
             outputs=[deficiency_box, roadmap_box]
         )
+
+        roadmap_btn = gr.Button("Challenge'ları Görüntüle", visible=False)
+
+        def show_challenges():
+            return (
+                gr.update(visible=False),  # roadmap_box
+                gr.update(visible=True)  # challenge_box
+            )
+
+        roadmap_btn.click(
+            show_challenges,
+            outputs=[roadmap_box, challenge_box]
+        )
+
+        back_btn_challenge.click(
+            lambda: (gr.update(visible=True), gr.update(visible=False)),
+            outputs=[roadmap_box, challenge_box]
+        )
+
 
     return demo
