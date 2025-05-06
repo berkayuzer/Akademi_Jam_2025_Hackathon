@@ -41,3 +41,26 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=401, detail="Invalid credentials.")
     access_token = create_access_token({"sub": user["username"]})
     return {"access_token": access_token, "token_type": "bearer"}
+
+# api.py'ye ekleyin
+from challenges import load_challenges, get_challenge_by_id
+
+class Challenge(BaseModel):
+    id: str
+    title: str
+    description: str
+    difficulty: str  # easy, medium, hard
+    category: str  # algorithms, data-structures, etc.
+    test_cases: List[Dict]
+    starter_code: str
+
+@app.get("/challenges", response_model=List[Challenge])
+def get_challenges():
+    return load_challenges()
+
+@app.get("/challenges/{challenge_id}", response_model=Challenge)
+def get_challenge(challenge_id: str):
+    challenge = get_challenge_by_id(challenge_id)
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+    return challenge
