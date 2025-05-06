@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ step | title }} - Challenge{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+  <!-- Üstte step başlığı ve açıklama -->
+  <div class="mb-6">
+    <h2 class="text-3xl font-bold text-indigo-800 mb-2">{{ step | title }}</h2>
+    {% if explanation %}
+    <p class="text-lg text-gray-700 mb-4">{{ explanation }}</p>
+    {% endif %}
+    {% if examples %}
+    <div class="mb-4">
+      <h4 class="font-semibold text-indigo-700 mb-2">Örnekler:</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for ex in examples %}
+        <div class="bg-gray-100 rounded p-3">
+          <div class="font-semibold">Girdi:</div>
+          <pre class="bg-white rounded p-2 text-sm mb-2">{{ ex.input }}</pre>
+          <div class="font-semibold">Çıktı:</div>
+          <pre class="bg-white rounded p-2 text-sm">{{ ex.output }}</pre>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  <!-- Challenge kutuları -->
+  {% if challenges %}
+  <h3 class="font-semibold text-xl mb-4">Challenge'lar:</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {% for c in challenges %}
+    <div class="bg-indigo-50 rounded-2xl p-6 text-center shadow flex flex-col items-center">
+      <div class="text-lg font-bold mb-2">{{ c.level | title }}</div>
+      <div class="font-semibold mb-2">{{ c.title }}</div>
+      <div class="mb-4 text-gray-700 text-sm">{{ c.description }}</div>
+      <a href="/challenge?lang={{ lang }}&topic={{ topic }}&step={{ step }}&level={{ c.level }}"
+         class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Başla</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>Bu step için challenge bulunamadı.</p>
+  {% endif %}
+  <div class="text-center mt-8">
+    <a href="/roadmap" class="bg-indigo-600 text-white px-6 py-2 rounded-full shadow hover:bg-indigo-700 transition">Yol Haritasına Dön</a>
+  </div>
+</div>
+{% endblock %}

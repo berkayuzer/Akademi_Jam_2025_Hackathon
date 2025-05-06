@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ challenge.title }}{% endblock %}
+{% block content %}
+<div class="flex flex-col md:flex-row gap-8">
+  <!-- Sol: Challenge Bilgisi -->
+  <div class="md:w-1/2 bg-white rounded-2xl shadow-lg p-6">
+    <h2 class="text-2xl font-bold text-indigo-800 mb-4">{{ challenge.title }}</h2>
+    <p class="mb-4">{{ challenge.description }}</p>
+    <div class="mb-4">
+      <span class="font-semibold">Seviye:</span> <span class="text-indigo-700">{{ challenge.level | title }}</span>
+    </div>
+    <div class="mb-4">
+      <span class="font-semibold">Örnek Girdi:</span>
+      <pre class="bg-gray-100 rounded p-2 text-sm">{{ challenge.example_input }}</pre>
+    </div>
+    <div class="mb-4">
+      <span class="font-semibold">Örnek Çıktı:</span>
+      <pre class="bg-gray-100 rounded p-2 text-sm">{{ challenge.example_output }}</pre>
+    </div>
+  </div>
+  <!-- Sağ: Kod Editörü ve Butonlar -->
+  <div class="md:w-1/2 bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+    <form id="code-form" class="flex flex-col h-full">
+      <label class="font-semibold mb-2">Kodunu Yaz:</label>
+      <textarea name="code" id="code" rows="12" class="w-full border rounded p-2 font-mono text-sm mb-4" placeholder="# Kodunu buraya yaz..."></textarea>
+      <input type="hidden" name="lang" value="{{ lang }}">
+      <input type="hidden" name="topic" value="{{ topic }}">
+      <input type="hidden" name="level" value="{{ level }}">
+      <input type="hidden" name="example_input" value="{{ challenge.example_input }}">
+      <input type="hidden" name="example_output" value="{{ challenge.example_output }}">
+      <div class="flex gap-4 mt-auto">
+        <button type="button" id="run-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Çalıştır</button>
+        <button type="button" id="submit-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Gönder</button>
+      </div>
+      <div id="result" class="mt-4 text-base font-semibold"></div>
+    </form>
+  </div>
+</div>
+<script>
+  document.getElementById('run-btn').onclick = async function() {
+    const form = document.getElementById('code-form');
+    const formData = new FormData(form);
+    const res = await fetch('/run_code', { method: 'POST', body: formData });
+    const data = await res.json();
+    document.getElementById('result').innerText = data.success ? 'Örnek test geçti! ✅' : 'Kod örnek testi geçemedi.';
+  };
+  document.getElementById('submit-btn').onclick = async function() {
+    const form = document.getElementById('code-form');
+    const formData = new FormData(form);
+    const res = await fetch('/submit_code', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('result').innerText = 'Tebrikler! Tüm testleri geçtiniz ve puan kazandınız! 🏆';
+    } else {
+      document.getElementById('result').innerText = data.error || 'Bazı testler başarısız.';
+    }
+  };
+</script>
+<div class="text-center mt-8">
+  <!-- "Konuya Dön" butonu kaldırıldı -->
+</div>
+{% endblock %}

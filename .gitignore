@@ -1,0 +1,33 @@
+# Python derleyici dosyaları
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ortam dosyaları
+.env
+
+# Veritabanı
+users.db
+
+# VSCode ayarları
+.vscode/
+
+# Mac ve Windows sistem dosyaları
+.DS_Store
+Thumbs.db
+
+# Log ve geçici dosyalar
+*.log
+*.tmp
+*.bak
+
+# Test ve coverage çıktıları
+htmlcov/
+.coverage
+
+# Node.js modülleri
+node_modules/
+
+# Diğer
+.eg.png

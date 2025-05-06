@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Anasayfa{% endblock %}
+
+{% block content %}
+<!-- Ana Başlık -->
+<h2 class="text-5xl font-extrabold mb-8 text-center text-indigo-900">📚 Öğrenme Panosu</h2>
+
+{% if progress %}
+<!-- İlerleme Durumu -->
+<p class="text-center text-lg font-medium mb-2">
+  📈 İlerleme: <span class="font-bold text-indigo-600">{{ progress_percent }}%</span> tamamlandı
+</p>
+<p class="text-center text-lg font-semibold mt-2 mb-8">
+  🎖 Seviyen: <span class="text-indigo-700">{{ badge }}</span>
+</p>
+
+<!-- Progress Bar -->
+<div class="w-3/4 mx-auto h-6 bg-indigo-200 rounded-full mb-12 overflow-hidden">
+  <div id="progress-bar"
+       class="h-full bg-indigo-600 rounded-full transition-all duration-1000 ease-out"
+       style="width: 0%;">
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const progressPercent = {{ progress_percent }};
+    const progressBar = document.getElementById("progress-bar");
+    progressBar.style.width = progressPercent + "%";
+  });
+</script>
+
+<!-- Konu Kartları -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6">
+  {% for p in progress %}
+  <div class="rounded-2xl shadow-lg p-6 text-center transform transition duration-300 hover:scale-105 
+              {% if p.completed %}bg-green-100{% else %}bg-yellow-100{% endif %}">
+    <h3 class="text-2xl font-semibold mb-3 text-gray-900">{{ p.language | title }} - {{ p.topic | title }}</h3>
+    <p class="text-sm mb-4">
+      {% if p.completed %}✅ Tamamlandı{% else %}⏳ Devam Ediliyor{% endif %}
+    </p>
+
+    <!-- Butonlar -->
+    <div class="flex justify-center gap-2">
+      <a href="/topic?lang={{ p.language }}&topic={{ p.topic }}&user={{ user }}"
+         class="inline-block bg-green-600 text-white font-semibold py-2 px-5 rounded-full shadow hover:bg-green-700 transition transform duration-300">
+         {% if p.completed %}Tekrar Et{% else %}Devam Et{% endif %}
+      </a>
+      {% if not p.completed %}
+      <form method="post" action="/complete_topic">
+        <input type="hidden" name="user" value="{{ user }}">
+        <input type="hidden" name="language" value="{{ p.language }}">
+        <input type="hidden" name="topic" value="{{ p.topic }}">
+        <button type="submit"
+                class="bg-blue-600 text-white px-5 py-2 rounded-full shadow hover:bg-blue-700 transition transform duration-300">
+          Tamamla ✅
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<p class="text-center text-lg text-gray-700">Henüz konu seçmedin. 
+  <a href="/dashboard?user={{ user }}" class="text-indigo-600 underline font-medium">Konu seçmek için tıkla</a>.
+</p>
+{% endif %}
+
+<!-- Çıkış Yap Butonu -->
+<div class="text-center mt-12">
+  <a href="/roadmap" class="bg-red-500 text-white px-6 py-3 rounded-full shadow hover:bg-red-600 transition transform duration-300">Yol Haritasına Dön</a>
+</div>
+
+{% endblock %}

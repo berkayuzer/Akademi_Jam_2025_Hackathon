@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ lang | title }} - {{ topic | title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+    <h2 class="text-3xl font-bold text-indigo-800 mb-6">
+        {{ lang | title }}: {{ topic | title }}
+    </h2>
+    {% if summary %}
+    <p class="mb-4 text-lg">{{ summary }}</p>
+    {% endif %}
+    {% if challenges %}
+    <h3 class="font-semibold text-xl mb-4">Challenge'lar:</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for c in challenges %}
+        <div class="bg-indigo-50 rounded-xl p-4 text-center shadow">
+            <div class="text-lg font-bold mb-2">{{ c.level | title }}</div>
+            <div class="font-semibold mb-2">{{ c.title }}</div>
+            <a href="/challenge?lang={{ lang }}&topic={{ topic }}&level={{ c.level }}" class="inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Başla</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Bu konu için içerik henüz hazırlanmadı.</p>
+    {% endif %}
+    <div class="mt-8 text-center">
+        <a href="/roadmap" class="bg-indigo-600 text-white px-6 py-2 rounded-full shadow hover:bg-indigo-700 transition">Yol Haritasına Dön</a>
+    </div>
+</div>
+{% endblock %}
+

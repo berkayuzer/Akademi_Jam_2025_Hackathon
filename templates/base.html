@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}AI Öğrenme Platformu{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-r from-blue-50 to-indigo-100 text-gray-800">
+    <header class="bg-indigo-600 text-white py-4 mb-6 shadow">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div></div> 
+            {% if request.session.get("user") %}
+            <nav>
+                <span class="mr-4 font-semibold">{{ request.session.get("user") }}</span>
+                <a href="/logout" class="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Çıkış</a>
+            </nav>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
